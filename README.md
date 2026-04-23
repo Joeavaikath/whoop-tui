@@ -36,7 +36,7 @@ Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) and the [WHO
 Go to [developer.whoop.com](https://developer.whoop.com) and create an application:
 
 - **Redirect URI**: `http://localhost:8080/callback`
-- **Privacy Policy URL**: `https://joeavaikath.github.io/whoop-tui/privacy.html`
+- **Privacy Policy URL**: run `make run` first, then use `http://localhost:8080/privacy` — or host `docs/privacy.html` yourself
 - **Scopes**: enable all (`read:profile`, `read:body_measurement`, `read:cycles`, `read:recovery`, `read:sleep`, `read:workout`, `offline`)
 
 ### 2. Clone and configure
