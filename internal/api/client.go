@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -177,6 +178,53 @@ func (c *Client) GetBodyMeasurement() (*BodyMeasurement, error) {
 	return &b, c.get("/v2/user/measurement/body", nil, &b)
 }
 
+func (c *Client) fetchAll(path, start, end string, decode func([]byte) (int, string, error)) error {
+	nextToken := ""
+	for {
+		params := url.Values{}
+		if start != "" {
+			params.Set("start", start)
+		}
+		if end != "" {
+			params.Set("end", end)
+		}
+		params.Set("limit", "25")
+		if nextToken != "" {
+			params.Set("nextToken", nextToken)
+		}
+
+		u := baseURL + path
+		if len(params) > 0 {
+			u += "?" + params.Encode()
+		}
+		resp, err := c.http.Get(u)
+		if err != nil {
+			return fmt.Errorf("request %s: %w", path, err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("request %s: status %d", path, resp.StatusCode)
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		_, token, err := decode(body)
+		if err != nil {
+			return err
+		}
+
+		if token == "" {
+			break
+		}
+		nextToken = token
+	}
+	return nil
+}
+
 func (c *Client) GetCycles(start, end string, limit int) (*PaginatedResponse[Cycle], error) {
 	params := url.Values{}
 	if start != "" {
@@ -190,6 +238,19 @@ func (c *Client) GetCycles(start, end string, limit int) (*PaginatedResponse[Cyc
 	}
 	var resp PaginatedResponse[Cycle]
 	return &resp, c.get("/v2/cycle", params, &resp)
+}
+
+func (c *Client) GetAllCycles(start, end string) ([]Cycle, error) {
+	var all []Cycle
+	err := c.fetchAll("/v2/cycle", start, end, func(body []byte) (int, string, error) {
+		var resp PaginatedResponse[Cycle]
+		if err := json.Unmarshal(body, &resp); err != nil {
+			return 0, "", err
+		}
+		all = append(all, resp.Records...)
+		return len(resp.Records), resp.NextToken, nil
+	})
+	return all, err
 }
 
 func (c *Client) GetRecoveries(start, end string, limit int) (*PaginatedResponse[Recovery], error) {
@@ -207,6 +268,19 @@ func (c *Client) GetRecoveries(start, end string, limit int) (*PaginatedResponse
 	return &resp, c.get("/v2/recovery", params, &resp)
 }
 
+func (c *Client) GetAllRecoveries(start, end string) ([]Recovery, error) {
+	var all []Recovery
+	err := c.fetchAll("/v2/recovery", start, end, func(body []byte) (int, string, error) {
+		var resp PaginatedResponse[Recovery]
+		if err := json.Unmarshal(body, &resp); err != nil {
+			return 0, "", err
+		}
+		all = append(all, resp.Records...)
+		return len(resp.Records), resp.NextToken, nil
+	})
+	return all, err
+}
+
 func (c *Client) GetSleeps(start, end string, limit int) (*PaginatedResponse[Sleep], error) {
 	params := url.Values{}
 	if start != "" {
@@ -222,6 +296,19 @@ func (c *Client) GetSleeps(start, end string, limit int) (*PaginatedResponse[Sle
 	return &resp, c.get("/v2/activity/sleep", params, &resp)
 }
 
+func (c *Client) GetAllSleeps(start, end string) ([]Sleep, error) {
+	var all []Sleep
+	err := c.fetchAll("/v2/activity/sleep", start, end, func(body []byte) (int, string, error) {
+		var resp PaginatedResponse[Sleep]
+		if err := json.Unmarshal(body, &resp); err != nil {
+			return 0, "", err
+		}
+		all = append(all, resp.Records...)
+		return len(resp.Records), resp.NextToken, nil
+	})
+	return all, err
+}
+
 func (c *Client) GetWorkouts(start, end string, limit int) (*PaginatedResponse[Workout], error) {
 	params := url.Values{}
 	if start != "" {
@@ -235,4 +322,17 @@ func (c *Client) GetWorkouts(start, end string, limit int) (*PaginatedResponse[W
 	}
 	var resp PaginatedResponse[Workout]
 	return &resp, c.get("/v2/activity/workout", params, &resp)
+}
+
+func (c *Client) GetAllWorkouts(start, end string) ([]Workout, error) {
+	var all []Workout
+	err := c.fetchAll("/v2/activity/workout", start, end, func(body []byte) (int, string, error) {
+		var resp PaginatedResponse[Workout]
+		if err := json.Unmarshal(body, &resp); err != nil {
+			return 0, "", err
+		}
+		all = append(all, resp.Records...)
+		return len(resp.Records), resp.NextToken, nil
+	})
+	return all, err
 }
