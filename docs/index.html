@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WHOOP TUI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0d0d1a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #16c79a;
+      margin-bottom: 8px;
+    }
+    .tagline {
+      font-size: 1.2rem;
+      color: #888;
+      margin-bottom: 48px;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: #f5c542;
+      margin: 40px 0 16px;
+    }
+    p { margin-bottom: 16px; color: #bbb; }
+    code {
+      background: #1a1a2e;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.9em;
+      color: #16c79a;
+    }
+    pre {
+      background: #1a1a2e;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #e0e0e0;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .feature {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .feature h3 {
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+    .feature p { font-size: 0.9rem; margin: 0; }
+    .recovery { border-left: 3px solid #16c79a; }
+    .strain { border-left: 3px solid #3498db; }
+    .sleep { border-left: 3px solid #f5c542; }
+    .workouts { border-left: 3px solid #e74c3c; }
+    a { color: #16c79a; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .links {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #2a2a3e;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .links a { margin-right: 24px; }
+    @media (max-width: 500px) {
+      .features { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WHOOP TUI</h1>
+    <p class="tagline">Your WHOOP data in the terminal.</p>
+
+    <p>A terminal user interface that connects to the WHOOP API and displays your recovery, strain, sleep, and workout data — right from the command line.</p>
+
+    <div class="features">
+      <div class="feature recovery">
+        <h3>Recovery</h3>
+        <p>Score, HRV, resting heart rate, SpO2, skin temperature</p>
+      </div>
+      <div class="feature strain">
+        <h3>Strain</h3>
+        <p>Daily strain score, heart rate, calories, trend charts</p>
+      </div>
+      <div class="feature sleep">
+        <h3>Sleep</h3>
+        <p>Stage breakdown, performance, efficiency, sleep need</p>
+      </div>
+      <div class="feature workouts">
+        <h3>Workouts</h3>
+        <p>Activity history, HR zones, distance, elevation</p>
+      </div>
+    </div>
+
+    <h2>Install</h2>
+    <pre>git clone https://github.com/Joeavaikath/whoop-tui.git
+cd whoop-tui
+make build</pre>
+
+    <h2>Setup</h2>
+    <p>Register an app at <a href="https://developer.whoop.com">developer.whoop.com</a>, then create a <code>.env</code> file:</p>
+    <pre>WHOOP_CLIENT_ID=your-client-id
+WHOOP_CLIENT_SECRET=your-client-secret</pre>
+
+    <h2>Run</h2>
+    <pre>make run</pre>
+    <p>The app will open a browser for OAuth login, then launch the dashboard.</p>
+
+    <h2>Controls</h2>
+    <pre>1-4        Switch views (Today / Week / 30d / 60d)
+Tab / ← →  Cycle between views
+↑ ↓ / j k  Scroll day list
+Enter      Drill into a day
+Esc        Back from detail
+r          Refresh data
+q          Quit</pre>
+
+    <div class="links">
+      <a href="https://github.com/Joeavaikath/whoop-tui">GitHub</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+  </div>
+</body>
+</html>

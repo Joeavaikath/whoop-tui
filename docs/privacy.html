@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — WHOOP TUI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0d0d1a;
+      color: #e0e0e0;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #16c79a;
+      margin-bottom: 8px;
+    }
+    .updated {
+      color: #888;
+      margin-bottom: 40px;
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: #f5c542;
+      margin: 32px 0 12px;
+    }
+    p { margin-bottom: 14px; color: #bbb; }
+    ul {
+      margin: 8px 0 16px 24px;
+      color: #bbb;
+    }
+    li { margin-bottom: 6px; }
+    code {
+      background: #1a1a2e;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.9em;
+      color: #16c79a;
+    }
+    strong { color: #e0e0e0; }
+    a { color: #16c79a; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back {
+      display: inline-block;
+      margin-bottom: 32px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="index.html">&larr; Back to WHOOP TUI</a>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: April 23, 2026</p>
+
+    <h2>Overview</h2>
+    <p>WHOOP TUI is a personal, open-source terminal application that displays your WHOOP data locally on your computer. It is not a hosted service.</p>
+
+    <h2>Data Collection</h2>
+    <p>WHOOP TUI does <strong>not</strong> collect, store, transmit, or share any personal data with third parties. All data retrieved from the WHOOP API is displayed locally in your terminal and stored only on your machine.</p>
+
+    <h2>Data Storage</h2>
+    <ul>
+      <li><strong>OAuth tokens</strong> are stored locally in <code>~/.config/whoop-tui/</code> on your machine.</li>
+      <li><strong>No data is sent</strong> to any server other than the official WHOOP API (<code>api.prod.whoop.com</code>).</li>
+      <li><strong>No analytics, telemetry, or tracking</strong> of any kind is used.</li>
+    </ul>
+
+    <h2>WHOOP API Access</h2>
+    <p>This application uses the WHOOP Developer API with your explicit authorization via OAuth 2.0. You can revoke access at any time through your WHOOP account settings.</p>
+
+    <h2>Scopes Requested</h2>
+    <ul>
+      <li><code>read:profile</code> — Your name and email</li>
+      <li><code>read:body_measurement</code> — Height, weight, max heart rate</li>
+      <li><code>read:cycles</code> — Daily strain and cycle data</li>
+      <li><code>read:recovery</code> — Recovery scores, HRV, resting heart rate</li>
+      <li><code>read:sleep</code> — Sleep stages and performance</li>
+      <li><code>read:workout</code> — Workout activity data</li>
+      <li><code>offline</code> — Refresh tokens for persistent login</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy, open an issue on the <a href="https://github.com/Joeavaikath/whoop-tui">GitHub repository</a>.</p>
+  </div>
+</body>
+</html>
