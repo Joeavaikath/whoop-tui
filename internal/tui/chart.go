@@ -12,16 +12,17 @@ import (
 var blocks = []string{" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
 
 type chart struct {
-	width      int
-	height     int
-	data       []float64
-	dates      []time.Time
-	minY       float64
-	maxY       float64
-	title      string
-	color      lipgloss.Color
-	colorFunc  func(float64) lipgloss.Color
-	yFormatter func(float64) string
+	width        int
+	height       int
+	data         []float64
+	dates        []time.Time
+	minY         float64
+	maxY         float64
+	title        string
+	color        lipgloss.Color
+	colorFunc    func(float64) lipgloss.Color
+	yFormatter   func(float64) string
+	highlightCol int // -1 = none
 }
 
 func (c chart) render() string {
@@ -152,9 +153,12 @@ func (c chart) render() string {
 
 		gridDot := lipgloss.NewStyle().Foreground(gridColor).Render("╌")
 
+		highlightBg := lipgloss.Color("#2a2a3e")
+
 		var barChars []string
 		for i := 0; i < numBars; i++ {
 			h := barHeights[i]
+			isHL := c.highlightCol >= 0 && i == c.highlightCol
 
 			barColor := c.color
 			if c.colorFunc != nil && !math.IsNaN(c.data[i]) {
@@ -163,18 +167,23 @@ func (c chart) render() string {
 
 			var cell string
 			if h < 0 {
-				// NaN — no data, show gridline if applicable
-				if hasLabel {
+				if isHL {
+					cell = lipgloss.NewStyle().Background(highlightBg).Render(strings.Repeat(" ", barW))
+				} else if hasLabel {
 					cell = strings.Repeat(gridDot, barW)
 				} else {
 					cell = strings.Repeat(" ", barW)
 				}
 			} else if h >= rowTop {
-				cell = lipgloss.NewStyle().Foreground(barColor).Render(
-					strings.Repeat("█", barW))
+				s := lipgloss.NewStyle().Foreground(barColor)
+				if isHL {
+					s = s.Background(highlightBg)
+				}
+				cell = s.Render(strings.Repeat("█", barW))
 			} else if h <= rowBottom {
-				// empty — show gridline if applicable
-				if hasLabel {
+				if isHL {
+					cell = lipgloss.NewStyle().Background(highlightBg).Render(strings.Repeat(" ", barW))
+				} else if hasLabel {
 					cell = strings.Repeat(gridDot, barW)
 				} else {
 					cell = strings.Repeat(" ", barW)
@@ -185,8 +194,11 @@ func (c chart) render() string {
 				if blockIdx > 8 {
 					blockIdx = 8
 				}
-				cell = lipgloss.NewStyle().Foreground(barColor).Render(
-					strings.Repeat(blocks[blockIdx], barW))
+				s := lipgloss.NewStyle().Foreground(barColor)
+				if isHL {
+					s = s.Background(highlightBg)
+				}
+				cell = s.Render(strings.Repeat(blocks[blockIdx], barW))
 			}
 
 			barChars = append(barChars, cell)
@@ -206,7 +218,14 @@ func (c chart) render() string {
 	// X axis
 	pad := strings.Repeat(" ", yLabelWidth)
 	totalBarWidth := numBars * (barW + gap)
-	lines = append(lines, labelStyle.Render(pad+"└"+strings.Repeat("─", totalBarWidth)))
+	axisRunes := []rune(strings.Repeat("─", totalBarWidth))
+	if c.highlightCol >= 0 && c.highlightCol < numBars {
+		pos := c.highlightCol*(barW+gap) + barW/2
+		if pos >= 0 && pos < len(axisRunes) {
+			axisRunes[pos] = '┴'
+		}
+	}
+	lines = append(lines, labelStyle.Render(pad+"└"+string(axisRunes)))
 
 	// date labels
 	if len(c.dates) > 0 {
@@ -250,6 +269,22 @@ func (c chart) render() string {
 			}
 
 			copy(dateLine[start:], []byte(label))
+		}
+
+		// highlight marker
+		if c.highlightCol >= 0 && c.highlightCol < numBars {
+			markerLine := make([]byte, totalBarWidth)
+			for j := range markerLine {
+				markerLine[j] = ' '
+			}
+			pos := c.highlightCol*(barW+gap) + barW/2
+			if pos >= 0 && pos < len(markerLine) {
+				markerLine[pos] = '^'
+			}
+			markerStr := string(markerLine)
+			markerStr = strings.Replace(markerStr, "^",
+				lipgloss.NewStyle().Foreground(white).Bold(true).Render("▲"), 1)
+			lines = append(lines, pad+" "+markerStr)
 		}
 
 		lines = append(lines, labelStyle.Render(pad+" "+string(dateLine)))

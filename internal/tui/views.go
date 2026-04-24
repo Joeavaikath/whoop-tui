@@ -275,18 +275,24 @@ func (m model) trendCharts() string {
 	}
 	chartHeight := 8
 
+	hlCol := -1
+	if len(m.dayEntries) > 0 {
+		hlCol = len(m.dayEntries) - 1 - m.cursor
+	}
+
 	var charts []string
 
 	if len(recovery.values) > 0 {
 		c := chart{
-			width:  chartWidth,
-			height: chartHeight,
-			data:   recovery.values,
-			dates:  recovery.dates,
-			minY:   0,
-			maxY:   100,
-			title:  "Recovery %",
-			color:  green,
+			width:        chartWidth,
+			height:       chartHeight,
+			data:         recovery.values,
+			dates:        recovery.dates,
+			minY:         0,
+			maxY:         100,
+			title:        "Recovery %",
+			color:        green,
+			highlightCol: hlCol,
 			colorFunc: func(v float64) lipgloss.Color {
 				// smooth gradient: red(0) -> yellow(50) -> green(100)
 				t := v / 100.0
@@ -321,14 +327,15 @@ func (m model) trendCharts() string {
 
 	if len(strain.values) > 0 {
 		c := chart{
-			width:  chartWidth,
-			height: chartHeight,
-			data:   strain.values,
-			dates:  strain.dates,
-			minY:   0,
-			maxY:   21,
-			title:  "Strain",
-			color:  blue,
+			width:        chartWidth,
+			height:       chartHeight,
+			data:         strain.values,
+			dates:        strain.dates,
+			minY:         0,
+			maxY:         21,
+			title:        "Strain",
+			color:        blue,
+			highlightCol: hlCol,
 			colorFunc: func(v float64) lipgloss.Color {
 				// light blue to dark blue based on strain intensity
 				t := v / 21.0
@@ -354,14 +361,15 @@ func (m model) trendCharts() string {
 		maxSleep = math.Ceil(maxSleep + 1)
 
 		c := chart{
-			width:  chartWidth,
-			height: chartHeight,
-			data:   sleep.values,
-			dates:  sleep.dates,
-			minY:   0,
-			maxY:   maxSleep,
-			title:  "Sleep",
-			color:  green,
+			width:        chartWidth,
+			height:       chartHeight,
+			data:         sleep.values,
+			dates:        sleep.dates,
+			minY:         0,
+			maxY:         maxSleep,
+			title:        "Sleep",
+			color:        green,
+			highlightCol: hlCol,
 			colorFunc: func(v float64) lipgloss.Color {
 				// smooth gradient: red(<5) -> yellow(6.5) -> green(>=8)
 				t := (v - 5.0) / 3.0 // 0 at 5h, 1 at 8h
