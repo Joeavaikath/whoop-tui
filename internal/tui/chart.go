@@ -166,7 +166,7 @@ func (c chart) render() string {
 			}
 
 			var cell string
-			if h < 0 {
+			if h < 0 || h <= rowBottom {
 				if isHL {
 					cell = lipgloss.NewStyle().Background(highlightBg).Render(strings.Repeat(" ", barW))
 				} else if hasLabel {
@@ -180,14 +180,6 @@ func (c chart) render() string {
 					s = s.Background(highlightBg)
 				}
 				cell = s.Render(strings.Repeat("█", barW))
-			} else if h <= rowBottom {
-				if isHL {
-					cell = lipgloss.NewStyle().Background(highlightBg).Render(strings.Repeat(" ", barW))
-				} else if hasLabel {
-					cell = strings.Repeat(gridDot, barW)
-				} else {
-					cell = strings.Repeat(" ", barW)
-				}
 			} else {
 				fill := h - rowBottom
 				blockIdx := fill

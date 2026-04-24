@@ -403,12 +403,94 @@ func (m model) trendCharts() string {
 	return lipgloss.JoinVertical(lipgloss.Left, charts...)
 }
 
-func (m model) dayList() string {
-	var lines []string
-	lines = append(lines, headerStyle.Render(fmt.Sprintf("  %-12s  %8s  %8s  %8s  %s",
-		"Date", "Recovery", "Strain", "Sleep", "Workouts")))
+type dayAvg struct {
+	rec, str, slp float64
+}
 
-	// scrolling window — charts take ~35 lines, header/tabs/help ~6, so day list gets the rest
+func avgColor(cur float64, all []dayAvg, i int, get func(dayAvg) float64, higherIsGood bool) lipgloss.Color {
+	// compare to next row (previous day, since list is reverse chronological)
+	if i+1 < len(all) {
+		prev := get(all[i+1])
+		if !math.IsNaN(prev) {
+			if higherIsGood {
+				if cur > prev {
+					return lipgloss.Color("#16c79a")
+				}
+				if cur < prev {
+					return lipgloss.Color("#e67e22")
+				}
+			} else {
+				if cur < prev {
+					return lipgloss.Color("#16c79a")
+				}
+				if cur > prev {
+					return lipgloss.Color("#e67e22")
+				}
+			}
+		}
+	}
+	return lipgloss.Color("#888888")
+}
+
+func (m model) dayList() string {
+	window := 3
+	if m.tab == tab30Day || m.tab == tab60Day {
+		window = 7
+	}
+	avgLabel := fmt.Sprintf("%dd", window)
+
+	// precompute rolling averages (dayEntries are reverse chronological)
+	dayAvgs := make([]dayAvg, len(m.dayEntries))
+	for i := range m.dayEntries {
+		recSum, recN := 0.0, 0
+		strSum, strN := 0.0, 0
+		slpSum, slpN := 0.0, 0
+
+		end := i + window
+		if end > len(m.dayEntries) {
+			end = len(m.dayEntries)
+		}
+		for j := i; j < end; j++ {
+			e := m.dayEntries[j]
+			if e.recovery != nil && e.recovery.Score != nil {
+				recSum += e.recovery.Score.RecoveryScore
+				recN++
+			}
+			if e.cycle != nil && e.cycle.Score != nil {
+				strSum += e.cycle.Score.Strain
+				strN++
+			}
+			if e.sleep != nil && e.sleep.Score != nil {
+				stages := e.sleep.Score.StageSummary
+				total := stages.TotalLightSleepTimeMilli +
+					stages.TotalSlowWaveSleepTimeMilli +
+					stages.TotalRemSleepTimeMilli
+				slpSum += float64(total) / 3600000.0
+				slpN++
+			}
+		}
+		if recN > 0 {
+			dayAvgs[i].rec = recSum / float64(recN)
+		} else {
+			dayAvgs[i].rec = math.NaN()
+		}
+		if strN > 0 {
+			dayAvgs[i].str = strSum / float64(strN)
+		} else {
+			dayAvgs[i].str = math.NaN()
+		}
+		if slpN > 0 {
+			dayAvgs[i].slp = slpSum / float64(slpN)
+		} else {
+			dayAvgs[i].slp = math.NaN()
+		}
+	}
+
+	var lines []string
+	lines = append(lines, headerStyle.Render(fmt.Sprintf("  %-12s  %8s %5s  %8s %5s  %8s  %s",
+		"Date", "Recovery", avgLabel, "Strain", avgLabel, "Sleep", "Workouts")))
+
+	// scrolling window
 	visibleRows := m.height - 42
 	if visibleRows < 5 {
 		visibleRows = 5
@@ -417,7 +499,6 @@ func (m model) dayList() string {
 		visibleRows = len(m.dayEntries)
 	}
 
-	// scroll offset to keep cursor visible
 	scrollStart := 0
 	if m.cursor >= visibleRows {
 		scrollStart = m.cursor - visibleRows + 1
@@ -434,6 +515,7 @@ func (m model) dayList() string {
 	for i := scrollStart; i < scrollEnd; i++ {
 		e := m.dayEntries[i]
 		date := e.date.Format("Mon Jan 2")
+		a := dayAvgs[i]
 
 		rec := "    —   "
 		if e.recovery != nil && e.recovery.Score != nil {
@@ -441,12 +523,22 @@ func (m model) dayList() string {
 			c := recoveryColor(s)
 			rec = lipgloss.NewStyle().Foreground(c).Render(fmt.Sprintf("  %5.0f%%", s))
 		}
+		recAvg := "     "
+		if !math.IsNaN(a.rec) {
+			recAvg = lipgloss.NewStyle().Foreground(avgColor(a.rec, dayAvgs, i, func(v dayAvg) float64 { return v.rec }, true)).
+				Render(fmt.Sprintf(" %3.0f%%", a.rec))
+		}
 
 		str := "    —   "
 		if e.cycle != nil && e.cycle.Score != nil {
 			s := e.cycle.Score.Strain
 			c := strainColor(s)
 			str = lipgloss.NewStyle().Foreground(c).Render(fmt.Sprintf("  %5.1f ", s))
+		}
+		strAvg := "     "
+		if !math.IsNaN(a.str) {
+			strAvg = lipgloss.NewStyle().Foreground(avgColor(a.str, dayAvgs, i, func(v dayAvg) float64 { return v.str }, true)).
+				Render(fmt.Sprintf(" %4.1f", a.str))
 		}
 
 		slp := "    —   "
@@ -470,7 +562,7 @@ func (m model) dayList() string {
 		}
 
 		prefix := "  "
-		line := fmt.Sprintf("%s%-12s  %s  %s  %s  %s", prefix, date, rec, str, slp, workoutStr)
+		line := fmt.Sprintf("%s%-12s  %s%s  %s%s  %s  %s", prefix, date, rec, recAvg, str, strAvg, slp, workoutStr)
 
 		if i == m.cursor {
 			line = selectedRowStyle.Render("▸ " + line[2:])
