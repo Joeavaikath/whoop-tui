@@ -1,8 +1,8 @@
 package tui
 
 import (
-	"github.com/jvaikath/whoop-tui/internal/api"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/jvaikath/whoop-tui/internal/api"
 )
 
 func Run(client *api.Client) error {

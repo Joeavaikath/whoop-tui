@@ -40,9 +40,9 @@ type model struct {
 	width   int
 	height  int
 
-	profile  *api.UserProfile
-	body     *api.BodyMeasurement
-	cache    map[tab]*tabCache
+	profile *api.UserProfile
+	body    *api.BodyMeasurement
+	cache   map[tab]*tabCache
 
 	// active view data (points into cache)
 	cycles     []api.Cycle

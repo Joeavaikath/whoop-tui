@@ -76,14 +76,14 @@ type Recovery struct {
 }
 
 type SleepStageSummary struct {
-	TotalInBedTimeMilli        int `json:"total_in_bed_time_milli"`
-	TotalAwakeTimeMilli        int `json:"total_awake_time_milli"`
-	TotalNoDataTimeMilli       int `json:"total_no_data_time_milli"`
-	TotalLightSleepTimeMilli   int `json:"total_light_sleep_time_milli"`
+	TotalInBedTimeMilli         int `json:"total_in_bed_time_milli"`
+	TotalAwakeTimeMilli         int `json:"total_awake_time_milli"`
+	TotalNoDataTimeMilli        int `json:"total_no_data_time_milli"`
+	TotalLightSleepTimeMilli    int `json:"total_light_sleep_time_milli"`
 	TotalSlowWaveSleepTimeMilli int `json:"total_slow_wave_sleep_time_milli"`
-	TotalRemSleepTimeMilli     int `json:"total_rem_sleep_time_milli"`
-	SleepCycleCount            int `json:"sleep_cycle_count"`
-	DisturbanceCount           int `json:"disturbance_count"`
+	TotalRemSleepTimeMilli      int `json:"total_rem_sleep_time_milli"`
+	SleepCycleCount             int `json:"sleep_cycle_count"`
+	DisturbanceCount            int `json:"disturbance_count"`
 }
 
 type SleepNeeded struct {
@@ -94,12 +94,12 @@ type SleepNeeded struct {
 }
 
 type SleepScore struct {
-	StageSummary                SleepStageSummary `json:"stage_summary"`
-	SleepNeeded                 SleepNeeded       `json:"sleep_needed"`
-	RespiratoryRate             *float64          `json:"respiratory_rate"`
-	SleepPerformancePercentage  *float64          `json:"sleep_performance_percentage"`
-	SleepConsistencyPercentage  *float64          `json:"sleep_consistency_percentage"`
-	SleepEfficiencyPercentage   *float64          `json:"sleep_efficiency_percentage"`
+	StageSummary               SleepStageSummary `json:"stage_summary"`
+	SleepNeeded                SleepNeeded       `json:"sleep_needed"`
+	RespiratoryRate            *float64          `json:"respiratory_rate"`
+	SleepPerformancePercentage *float64          `json:"sleep_performance_percentage"`
+	SleepConsistencyPercentage *float64          `json:"sleep_consistency_percentage"`
+	SleepEfficiencyPercentage  *float64          `json:"sleep_efficiency_percentage"`
 }
 
 type Sleep struct {
@@ -126,15 +126,15 @@ type ZoneDurations struct {
 }
 
 type WorkoutScore struct {
-	Strain             float64       `json:"strain"`
-	AverageHeartRate   int           `json:"average_heart_rate"`
-	MaxHeartRate       int           `json:"max_heart_rate"`
-	Kilojoule          float64       `json:"kilojoule"`
-	PercentRecorded    float64       `json:"percent_recorded"`
-	DistanceMeter      *float64      `json:"distance_meter"`
-	AltitudeGainMeter  *float64      `json:"altitude_gain_meter"`
-	AltitudeChangeMeter *float64     `json:"altitude_change_meter"`
-	ZoneDurations      ZoneDurations `json:"zone_duration"`
+	Strain              float64       `json:"strain"`
+	AverageHeartRate    int           `json:"average_heart_rate"`
+	MaxHeartRate        int           `json:"max_heart_rate"`
+	Kilojoule           float64       `json:"kilojoule"`
+	PercentRecorded     float64       `json:"percent_recorded"`
+	DistanceMeter       *float64      `json:"distance_meter"`
+	AltitudeGainMeter   *float64      `json:"altitude_gain_meter"`
+	AltitudeChangeMeter *float64      `json:"altitude_change_meter"`
+	ZoneDurations       ZoneDurations `json:"zone_duration"`
 }
 
 type Workout struct {
