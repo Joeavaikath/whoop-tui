@@ -46,7 +46,13 @@ git clone https://github.com/Joeavaikath/whoop-tui.git
 cd whoop-tui
 ```
 
-Create a `.env` file with your credentials:
+Run the setup command to configure your credentials:
+
+```bash
+make setup
+```
+
+Or manually create a `.env` file:
 
 ```
 WHOOP_CLIENT_ID=your-client-id
