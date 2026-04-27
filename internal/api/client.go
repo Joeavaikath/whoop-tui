@@ -16,6 +16,7 @@ type Client struct {
 }
 
 func NewClient(httpClient *http.Client) *Client {
+	httpClient.Timeout = 15 * time.Second
 	return &Client{http: httpClient}
 }
 
@@ -151,6 +152,14 @@ type Workout struct {
 	Score          *WorkoutScore `json:"score"`
 }
 
+func truncateBody(b []byte) string {
+	s := string(b)
+	if len(s) > 200 {
+		s = s[:200] + "..."
+	}
+	return s
+}
+
 func (c *Client) get(path string, params url.Values, out any) error {
 	u := baseURL + path
 	if len(params) > 0 {
@@ -163,7 +172,8 @@ func (c *Client) get(path string, params url.Values, out any) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("request %s: status %d", path, resp.StatusCode)
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("request %s: status %d: %s", path, resp.StatusCode, truncateBody(body))
 	}
 	return json.NewDecoder(resp.Body).Decode(out)
 }
@@ -204,7 +214,8 @@ func (c *Client) fetchAll(path, start, end string, decode func([]byte) (int, str
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("request %s: status %d", path, resp.StatusCode)
+			b, _ := io.ReadAll(resp.Body)
+			return fmt.Errorf("request %s: status %d: %s", path, resp.StatusCode, truncateBody(b))
 		}
 
 		body, err := io.ReadAll(resp.Body)

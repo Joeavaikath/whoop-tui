@@ -103,7 +103,10 @@ func (m model) loadProfile() tea.Cmd {
 		if err != nil {
 			return profileLoadedMsg{err: err}
 		}
-		body, _ := m.client.GetBodyMeasurement()
+		body, err := m.client.GetBodyMeasurement()
+		if err != nil {
+			body = nil
+		}
 		return profileLoadedMsg{profile: profile, body: body}
 	}
 }
@@ -325,9 +328,8 @@ func (m model) switchTab(t tab) (tea.Model, tea.Cmd) {
 	m.tab = t
 	m.detailOpen = false
 
-	if c, ok := m.cache[t]; ok {
+	if _, ok := m.cache[t]; ok {
 		m.switchToCache(t)
-		_ = c
 		return m, nil
 	}
 
